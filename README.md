@@ -1,46 +1,43 @@
-# Getting Started with Create React App
+# TypeScript React Test Fixture Demo
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repository exists to demonstrate how to use [cooky-cutter](https://skovy.github.io/cooky-cutter/#/) with [faker.js](https://github.com/marak/Faker.js/) to generate realistic test data in your TypeScript unit tests. The project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+## Prerequisite
 
-In the project directory, you can run:
+- [Node >=14](https://nodejs.org/en/)
 
-### `yarn start`
+## Running the tests
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+To run the test suite (in watch mode) you can run to following from the root of the project:
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+npm run test
+```
 
-### `yarn test`
+## Understanding the tests
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+There are two test suites, one for the `<Home/>` component and one for the `<UserItem />` component. Both of these component rely on a `User` model that has various properties.
 
-### `yarn build`
+If you have a look at the file [src/fixtures/User.ts](src/fixtures/User.ts) you will see where we are setting up that fixture. We are using a combination of a library called `cooky-cutter` for defining the feature, and the using the library `faker.js` to generate realistic data.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Now in the actual tests we can use that fixture to generate data. For example if we want to create a single user we can do the following:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```typescript
+var user = userFixture();
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+You can also override certain properties:
 
-### `yarn eject`
+```typescript
+var user = userFixture({ accountStatus: AccountStatus.Inactive });
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+You can see examples of these in the file [src/components/UserItem.test.tsx](src/components/UserItem.test.tsx).
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+You can also create arrays of users such as in the test [src/pages/App.test.tsx](src/pages/App.test.tsx):
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```typescript
+var getUsersResponse = array(userFixture, 5)();
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+I have also configured cooky-cutter in [src/setupTests.ts](src/setupTests.ts) to break the build if it finds a hard coded value in one of the fixture setups.
